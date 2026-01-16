@@ -35,7 +35,7 @@ OurTestScene::OurTestScene(
 
 //
 // Called once at initialization
-//
+///
 void OurTestScene::Init()
 {
 	m_camera = new Camera(
