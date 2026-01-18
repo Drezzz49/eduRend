@@ -198,6 +198,7 @@
     <ClCompile Include="imgui\imgui_tables.cpp" />
     <ClCompile Include="imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\cube.cpp" />
     <ClCompile Include="src\inputhandler.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\objloader.cpp" />
