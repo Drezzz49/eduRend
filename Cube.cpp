@@ -8,7 +8,7 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 
 	// Populate the vertex array with 4 Vertices
-	Vertex v0, v1, v2, v3, v4, v5, v6, v7;
+	Vertex v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15;
 	v0.Position = { -0.5, -0.5f, 0.5f }; //pos
 	v1.Position = { 0.5, -0.5f, 0.5f };
 	v2.Position = { 0.5, 0.5f, 0.5f };
@@ -73,9 +73,72 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	indices.push_back(7);
 
 
+	///////////////////////
+	// toppen
+	// Populate the vertex array with 4 Vertices
+	v8.Position = { 0.5, 0.5f, -0.5f }; //pos
+	v9.Position = { -0.5, 0.5f, -0.5f };
+	v10.Position = { -0.5, 0.5f, 0.5f };
+	v11.Position = { 0.5, 0.5f, 0.5f };
+
+	v8.TexCoord = { 0, 0 }; //how the texture is mapped topleft 0,1 topright 1,1 bottomleft 0,0 bottomright 1,0
+	v9.TexCoord = { 0, 1 };
+	v10.TexCoord = { 1, 1 };
+	v11.TexCoord = { 1, 0 };
+
+	v8.Normal = { 0, 1, 0 }; //pekar upp
+	v9.Normal = { 0, 1, 0 };
+	v10.Normal = { 0, 1, 0 };
+	v11.Normal = { 0, 1, 0 };
+
+	vertices.push_back(v8);
+	vertices.push_back(v9);
+	vertices.push_back(v10);
+	vertices.push_back(v11);
+
+	// Populate the index array with two triangles
+	// Triangle #1
+	indices.push_back(8);
+	indices.push_back(9);
+	indices.push_back(11);
+	// Triangle #2
+	indices.push_back(9);
+	indices.push_back(10);
+	indices.push_back(11);
 
 
+	///////////////////////
+// botten
+// Populate the vertex array with 4 Vertices
+	v12.Position = { -0.5, -0.5f, -0.5f }; //pos
+	v13.Position = { 0.5, -0.5f, -0.5f };
+	v14.Position = { 0.5, -0.5f, 0.5f };
+	v15.Position = { -0.5, -0.5f, 0.5f };
 
+	v12.TexCoord = { 0, 0 }; //how the texture is mapped topleft 0,1 topright 1,1 bottomleft 0,0 bottomright 1,0
+	v13.TexCoord = { 0, 1 };
+	v14.TexCoord = { 1, 1 };
+	v15.TexCoord = { 1, 0 };
+
+	v12.Normal = { 0, -1, 0 }; //pekar upp
+	v13.Normal = { 0, -1, 0 };
+	v14.Normal = { 0, -1, 0 };
+	v15.Normal = { 0, -1, 0 };
+
+	vertices.push_back(v12);
+	vertices.push_back(v13);
+	vertices.push_back(v14);
+	vertices.push_back(v15);
+
+	// Populate the index array with two triangles
+	// Triangle #1
+	indices.push_back(12);
+	indices.push_back(13);
+	indices.push_back(15);
+	// Triangle #2
+	indices.push_back(13);
+	indices.push_back(14);
+	indices.push_back(15);
 
 
 
