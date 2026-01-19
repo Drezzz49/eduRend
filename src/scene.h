@@ -91,6 +91,7 @@ class OurTestScene : public Scene
 
 	mat4f m_sponza_transform;
 	mat4f m_quad_transform;
+	mat4f m_cube_transform; //kub transformen
 
 	mat4f m_view_matrix;
 	mat4f m_projection_matrix;

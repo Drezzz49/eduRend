@@ -8,19 +8,22 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 
 	// Populate the vertex array with 4 Vertices
-	Vertex v0, v1, v2, v3;
-	v0.Position = { -0.5, -0.5f, 0.0f }; //pos
+	Vertex v0, v1, v2, v3, v4, v5, v6, v7;
+	v0.Position = { -0.5, -0.5f, 0.5f }; //pos
+	v1.Position = { 0.5, -0.5f, 0.5f };
+	v2.Position = { 0.5, 0.5f, 0.5f };
+	v3.Position = { -0.5, 0.5f, 0.5f };
+
 	v0.Normal = { 0, 0, 1 }; //direction of the surface
-	v0.TexCoord = { 0, 0 }; //how the texture is mapped topleft 0,1 topright 1,1 bottomleft 0,0 bottomright 1,0
-	v1.Position = { 0.5, -0.5f, 0.0f };
 	v1.Normal = { 0, 0, 1 };
-	v1.TexCoord = { 0, 1 };
-	v2.Position = { 0.5, 0.5f, 0.0f };
 	v2.Normal = { 0, 0, 1 };
-	v2.TexCoord = { 1, 1 };
-	v3.Position = { -0.5, 0.5f, 0.0f };
 	v3.Normal = { 0, 0, 1 };
+
+	v0.TexCoord = { 0, 0 }; //how the texture is mapped topleft 0,1 topright 1,1 bottomleft 0,0 bottomright 1,0
+	v1.TexCoord = { 0, 1 };
+	v2.TexCoord = { 1, 1 };
 	v3.TexCoord = { 1, 0 };
+
 	vertices.push_back(v0);
 	vertices.push_back(v1);
 	vertices.push_back(v2);
@@ -36,7 +39,40 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	indices.push_back(2);
 	indices.push_back(3);
 
-	v0.Position = {};
+	///////////////////////
+	// backsida
+	// Populate the vertex array with 4 Vertices
+	v4.Position = { 0.5, -0.5f, -0.5f }; //pos
+	v5.Position = { -0.5, -0.5f, -0.5f };
+	v6.Position = { -0.5, 0.5f, -0.5f };
+	v7.Position = { 0.5, 0.5f, -0.5f };
+
+	v4.TexCoord = { 0, 0 }; //how the texture is mapped topleft 0,1 topright 1,1 bottomleft 0,0 bottomright 1,0
+	v5.TexCoord = { 0, 1 };
+	v6.TexCoord = { 1, 1 };
+	v7.TexCoord = { 1, 0 };
+
+	v4.Normal = { 0, 0, -1 }; //direction of the surface
+	v5.Normal = { 0, 0, -1 };
+	v6.Normal = { 0, 0, -1 };
+	v7.Normal = { 0, 0, -1 };
+
+	vertices.push_back(v4);
+	vertices.push_back(v5);
+	vertices.push_back(v6);
+	vertices.push_back(v7);
+
+	// Populate the index array with two triangles
+	// Triangle #1
+	indices.push_back(4);
+	indices.push_back(5);
+	indices.push_back(7);
+	// Triangle #2
+	indices.push_back(5);
+	indices.push_back(6);
+	indices.push_back(7);
+
+
 
 
 
