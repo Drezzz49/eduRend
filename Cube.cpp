@@ -8,7 +8,7 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 
 	// Populate the vertex array with 4 Vertices
-	Vertex v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15;
+	Vertex v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23;
 	v0.Position = { -0.5, -0.5f, 0.5f }; //pos
 	v1.Position = { 0.5, -0.5f, 0.5f };
 	v2.Position = { 0.5, 0.5f, 0.5f };
@@ -42,17 +42,17 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	///////////////////////
 	// backsida
 	// Populate the vertex array with 4 Vertices
-	v4.Position = { 0.5, -0.5f, -0.5f }; //pos
+	v4.Position = { 0.5, -0.5f, -0.5f };
 	v5.Position = { -0.5, -0.5f, -0.5f };
 	v6.Position = { -0.5, 0.5f, -0.5f };
 	v7.Position = { 0.5, 0.5f, -0.5f };
 
-	v4.TexCoord = { 0, 0 }; //how the texture is mapped topleft 0,1 topright 1,1 bottomleft 0,0 bottomright 1,0
+	v4.TexCoord = { 0, 0 };
 	v5.TexCoord = { 0, 1 };
 	v6.TexCoord = { 1, 1 };
 	v7.TexCoord = { 1, 0 };
 
-	v4.Normal = { 0, 0, -1 }; //direction of the surface
+	v4.Normal = { 0, 0, -1 }; 
 	v5.Normal = { 0, 0, -1 };
 	v6.Normal = { 0, 0, -1 };
 	v7.Normal = { 0, 0, -1 };
@@ -76,17 +76,17 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	///////////////////////
 	// toppen
 	// Populate the vertex array with 4 Vertices
-	v8.Position = { 0.5, 0.5f, -0.5f }; //pos
+	v8.Position = { 0.5, 0.5f, -0.5f };
 	v9.Position = { -0.5, 0.5f, -0.5f };
 	v10.Position = { -0.5, 0.5f, 0.5f };
 	v11.Position = { 0.5, 0.5f, 0.5f };
 
-	v8.TexCoord = { 0, 0 }; //how the texture is mapped topleft 0,1 topright 1,1 bottomleft 0,0 bottomright 1,0
+	v8.TexCoord = { 0, 0 };
 	v9.TexCoord = { 0, 1 };
 	v10.TexCoord = { 1, 1 };
 	v11.TexCoord = { 1, 0 };
 
-	v8.Normal = { 0, 1, 0 }; //pekar upp
+	v8.Normal = { 0, 1, 0 };
 	v9.Normal = { 0, 1, 0 };
 	v10.Normal = { 0, 1, 0 };
 	v11.Normal = { 0, 1, 0 };
@@ -108,19 +108,19 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 
 	///////////////////////
-// botten
-// Populate the vertex array with 4 Vertices
+	// botten
+	// Populate the vertex array with 4 Vertices
 	v12.Position = { -0.5, -0.5f, -0.5f }; //pos
 	v13.Position = { 0.5, -0.5f, -0.5f };
 	v14.Position = { 0.5, -0.5f, 0.5f };
 	v15.Position = { -0.5, -0.5f, 0.5f };
 
-	v12.TexCoord = { 0, 0 }; //how the texture is mapped topleft 0,1 topright 1,1 bottomleft 0,0 bottomright 1,0
+	v12.TexCoord = { 0, 0 };
 	v13.TexCoord = { 0, 1 };
 	v14.TexCoord = { 1, 1 };
 	v15.TexCoord = { 1, 0 };
 
-	v12.Normal = { 0, -1, 0 }; //pekar upp
+	v12.Normal = { 0, -1, 0 };
 	v13.Normal = { 0, -1, 0 };
 	v14.Normal = { 0, -1, 0 };
 	v15.Normal = { 0, -1, 0 };
@@ -139,6 +139,72 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	indices.push_back(13);
 	indices.push_back(14);
 	indices.push_back(15);
+
+	////////////////////////////
+	// högersidan
+	// Populate the vertex array with 4 Vertices
+	v16.Position = { 0.5, -0.5f, 0.5f };
+	v17.Position = { 0.5, -0.5f, -0.5f };
+	v18.Position = { 0.5, 0.5f, -0.5f };
+	v19.Position = { 0.5, 0.5f, 0.5f };
+
+	v16.TexCoord = { 0, 0 }; 
+	v17.TexCoord = { 0, 1 };
+	v18.TexCoord = { 1, 1 };
+	v19.TexCoord = { 1, 0 };
+
+	v16.Normal = { 1, 0, 0 };
+	v17.Normal = { 1, 0, 0 };
+	v18.Normal = { 1, 0, 0 };
+	v19.Normal = { 1, 0, 0 };
+
+	vertices.push_back(v16);
+	vertices.push_back(v17);
+	vertices.push_back(v18);
+	vertices.push_back(v19);
+
+	// Populate the index array with two triangles
+	// Triangle #1
+	indices.push_back(16);
+	indices.push_back(17);
+	indices.push_back(19);
+	// Triangle #2
+	indices.push_back(17);
+	indices.push_back(18);
+	indices.push_back(19);
+
+	////////////////////////////
+	// vänstersidan
+	// Populate the vertex array with 4 Vertices
+	v20.Position = { -0.5, -0.5f, 0.5f };
+	v21.Position = { -0.5, -0.5f, -0.5f };
+	v22.Position = { -0.5, 0.5f, -0.5f };
+	v23.Position = { -0.5, 0.5f, 0.5f };
+
+	v20.TexCoord = { 0, 0 };
+	v21.TexCoord = { 0, 1 };
+	v22.TexCoord = { 1, 1 };
+	v23.TexCoord = { 1, 0 };
+
+	v20.Normal = { -1, 0, 0 };
+	v21.Normal = { -1, 0, 0 };
+	v22.Normal = { -1, 0, 0 };
+	v23.Normal = { -1, 0, 0 };
+
+	vertices.push_back(v20);
+	vertices.push_back(v21);
+	vertices.push_back(v22);
+	vertices.push_back(v23);
+
+	// Populate the index array with two triangles
+	// Triangle #1
+	indices.push_back(20);
+	indices.push_back(23);
+	indices.push_back(21);
+	// Triangle #2
+	indices.push_back(21);
+	indices.push_back(23);
+	indices.push_back(22);
 
 
 
