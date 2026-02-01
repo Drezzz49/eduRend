@@ -78,6 +78,13 @@ void OurTestScene::Update(
 	if(input_handler.IsKeyPressed(Keys::Esc))
 		PostQuitMessage(0);
 
+	// Mouse look
+	long mousedx = input_handler.GetMouseDeltaX();
+	long mousedy = input_handler.GetMouseDeltaY();
+	float mouse_sensitivity = 0.002f;
+	m_camera->Rotate(-mousedx * mouse_sensitivity, -mousedy * mouse_sensitivity);
+
+
 	// Now set/update object transformations
 	// This can be done using any sequence of transformation matrices,
 	// but the T*R*S order is most common; i.e. scale, then rotate, and then translate.

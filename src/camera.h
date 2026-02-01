@@ -24,7 +24,14 @@ public:
 	 * @param[in] far_plane Far plane distance, must be larger than the near plane.
 	*/
 	inline constexpr Camera(float vertical_fov, float aspect_ratio, float near_plane, float far_plane) noexcept 
-		: m_vertical_fov(vertical_fov), m_aspect_ratio(aspect_ratio), m_near_plane(near_plane), m_far_plane(far_plane), m_position(0.0f) {}
+		: m_vertical_fov(vertical_fov), 
+		m_aspect_ratio(aspect_ratio),
+		pitch(0.0f), // rot runt x-axeln
+		yaw(0.0f), // rot runt y-axeln
+		m_near_plane(near_plane), 
+		m_far_plane(far_plane), 
+		m_position(0.0f)
+	{}
 
 	/**
 	 * @brief Move the camera to a new position
@@ -58,10 +65,17 @@ public:
 	*/
 	linalg::mat4f ProjectionMatrix() const noexcept;
 
+
+	void Rotate(float delta_yaw, float delta_pitch) noexcept; //noexcept promises to throw no exceptions
+
 private:
 	// Aperture attributes
 	float m_vertical_fov;
 	float m_aspect_ratio;
+
+	// angles
+	float pitch; // rotation around x-axis
+	float yaw;   // rotation around y-axis
 
 	// Clip planes in view space coordinates
 	// Evrything outside of [m_near_plane, m_far_plane] is clipped away on the GPU side
