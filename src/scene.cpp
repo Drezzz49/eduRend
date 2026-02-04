@@ -51,6 +51,8 @@ void OurTestScene::Init()
 	// Create objects
 	m_quad = new QuadModel(m_dxdevice, m_dxdevice_context);
 	m_cube = new Cube(m_dxdevice, m_dxdevice_context);
+	m_cube_earth = new Cube(m_dxdevice, m_dxdevice_context);
+	m_cube_moon = new Cube(m_dxdevice, m_dxdevice_context);
 	m_sponza = new OBJModel("assets/crytek-sponza/sponza.obj", m_dxdevice, m_dxdevice_context);
 }
 
@@ -96,10 +98,35 @@ void OurTestScene::Update(
 		mat4f::rotation(-m_angle, 0.0f, 1.0f, 0.0f) *	// Rotate continuously around the y-axis
 		mat4f::scaling(1.5, 1.5, 1.5);				// Scale uniformly to 150%
 
-	// Cube model-to-world transformation
-	m_cube_transform = mat4f::translation(0, 0, 0) *			// No translation
-		mat4f::rotation(-m_angle, 0.0f, 1.0f, 0.0f) *	// Rotate continuously around the y-axis
-		mat4f::scaling(1.5, 1.5, 1.5);				// Scale uniformly to 150%
+
+
+	//om man har rotation för translation roterar de runt föräldern
+	//om man har translation för rotation roterar de runt sin egen axel
+	//ordningen händer bakifrån och framåt
+
+	m_cube_transform = //kuben "solen"
+		mat4f::translation(0, 0, 0) *			//translation eller flyttning
+		mat4f::rotation(-m_angle, 0.0f, 1.0f, 0.0f) *	// rotera med farten -m_angle, runt y-axeln
+		mat4f::scaling(1.5, 1.5, 1.5);				// skala
+	
+	m_cube_earth_transform = // jorden
+		mat4f::rotation(m_angle * 2.5f, 0.0f, 1.0f, 0.0f) *   //vi måste göra rotation först för att den ska rotera runt solen och inte sig själv, för matrisernas ordning spelar roll
+		mat4f::translation(2.0f, 0.0f, 0.0f) *
+		mat4f::scaling(0.7f, 0.7f, 0.7f);              
+
+	m_cube_moon_transform =	// månen
+		mat4f::rotation(-m_angle * 2.5f, 0.0f, 1.0f, 0.0f) *
+		mat4f::translation(1.0f, 0.0f, 0.0f) *
+		mat4f::scaling(0.4f, 0.4f, 0.4f);
+
+	//nu är jorden och månen utplacerad runt origo, men roterar med m_angle * x runt origo och inte runt sin egen axel
+	//vi flyttar sen rotationspunkten för jorden och månen till solen respektive jorden genom att multiplicera med föräldrarnas transform
+	m_cube_earth_transform = m_cube_transform * m_cube_earth_transform;
+	m_cube_moon_transform = m_cube_earth_transform * m_cube_moon_transform;
+
+
+
+
 
 	// Sponza model-to-world transformation
 	m_sponza_transform = mat4f::translation(0, -5, 0) *		 // Move down 5 units
@@ -107,7 +134,7 @@ void OurTestScene::Update(
 		mat4f::scaling(0.05f);						 // The scene is quite large so scale it down to 5%
 
 	// Increment the rotation angle.
-	m_angle += m_angular_velocity * dt;
+	m_angle += m_angular_velocity * dt * 0.4;
 
 	// Print fps
 	m_fps_cooldown -= dt;
@@ -128,7 +155,7 @@ void OurTestScene::Render()
 	m_dxdevice_context->VSSetConstantBuffers(0, 1, &m_transformation_buffer);
 
 	// Obtain the matrices needed for rendering from the camera
-	m_view_matrix = m_camera->WorldToViewMatrix();
+	m_view_matrix = m_camera->WorldToViewMatrix(); //view-matrisen, som är den som gör att det ser ut som att kameran rör sig i scenen
 	m_projection_matrix = m_camera->ProjectionMatrix();
 
 	// Load matrices + the Quad's transformation to the device and render it
@@ -137,6 +164,12 @@ void OurTestScene::Render()
 
 	UpdateTransformationBuffer(m_cube_transform, m_view_matrix, m_projection_matrix);
 	m_cube->Render(); //kub render
+
+	UpdateTransformationBuffer(m_cube_earth_transform, m_view_matrix, m_projection_matrix);
+	m_cube_earth->Render(); //jorden render
+
+	UpdateTransformationBuffer(m_cube_moon_transform, m_view_matrix, m_projection_matrix);
+	m_cube_moon->Render(); //månden render
 
 	// Load matrices + Sponza's transformation to the device and render it
 	UpdateTransformationBuffer(m_sponza_transform, m_view_matrix, m_projection_matrix);
@@ -148,6 +181,11 @@ void OurTestScene::Release()
 	SAFE_DELETE(m_quad);
 	SAFE_DELETE(m_sponza);
 	SAFE_DELETE(m_camera);
+	
+	
+	SAFE_DELETE(m_cube);
+	SAFE_DELETE(m_cube_earth);
+	SAFE_DELETE(m_cube_moon);
 
 	SAFE_RELEASE(m_transformation_buffer);
 	// + release other CBuffers

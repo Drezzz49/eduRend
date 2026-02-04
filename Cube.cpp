@@ -24,15 +24,15 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	v2.TexCoord = { 1, 1 };
 	v3.TexCoord = { 1, 0 };
 
-	vertices.push_back(v0);
+	vertices.push_back(v0); //vertices är en punktlista, så vi pushar in varje vertex (punkt) i listan
 	vertices.push_back(v1);
 	vertices.push_back(v2);
 	vertices.push_back(v3);
 
 	// Populate the index array with two triangles
 	// Triangle #1
-	indices.push_back(0);
-	indices.push_back(1);
+	indices.push_back(0); //indices är en lista av heltal som beskriver hur punkterna ska kopplas ihop till trianglar.
+	indices.push_back(1); 
 	indices.push_back(3);
 	// Triangle #2
 	indices.push_back(1);

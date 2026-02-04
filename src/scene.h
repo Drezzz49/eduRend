@@ -87,11 +87,15 @@ class OurTestScene : public Scene
 
 	Model* m_quad;
 	Model* m_cube; //min kub
+	Model* m_cube_earth; //jorden, ett lager åt från vanliga kuben som ska vara solen
+	Model* m_cube_moon; //månen, ett lager åt från jorden
 	Model* m_sponza;
 
 	mat4f m_sponza_transform;
 	mat4f m_quad_transform;
 	mat4f m_cube_transform; //kub transformen
+	mat4f m_cube_earth_transform; //kub transformen
+	mat4f m_cube_moon_transform; //kub transformen
 
 	mat4f m_view_matrix;
 	mat4f m_projection_matrix;
