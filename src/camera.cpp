@@ -59,6 +59,28 @@ void Camera::Rotate(float delta_yaw, float delta_pitch) noexcept
 
 
 
+vec3f Camera::GetForward() const noexcept
+{
+	return normalize(vec3f(
+		-sin(yaw) * cos(pitch),
+		sin(pitch),
+		-cos(yaw) * cos(pitch)
+	));
+}
+
+vec3f Camera::GetRight() const noexcept
+{
+	vec3f forward = GetForward();
+	vec3f world_up = vec3f(0.0f, 1.0f, 0.0f);
+
+	return normalize(forward % world_up);
+}
+
+vec3f Camera::GetUp() const noexcept
+{
+	return normalize(GetRight() % GetForward());
+}
+
 mat4f Camera::ProjectionMatrix() const noexcept
 {
 	return mat4f::projection(m_vertical_fov, m_aspect_ratio, m_near_plane, m_far_plane);

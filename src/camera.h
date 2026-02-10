@@ -66,7 +66,16 @@ public:
 	linalg::mat4f ProjectionMatrix() const noexcept;
 
 
+
+	linalg::vec3f GetForward() const noexcept;
+
+	linalg::vec3f GetRight() const noexcept;
+
+	linalg::vec3f GetUp() const noexcept;
+
+
 	void Rotate(float delta_yaw, float delta_pitch) noexcept; //noexcept promises to throw no exceptions
+
 
 private:
 	// Aperture attributes

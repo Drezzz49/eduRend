@@ -65,19 +65,25 @@ void OurTestScene::Update(
 	const InputHandler& input_handler)
 {
 	// Basic camera control
-	if (input_handler.IsKeyPressed(Keys::Up) || input_handler.IsKeyPressed(Keys::W))
-		m_camera->Move({ 0.0f, 0.0f, -m_camera_velocity * dt });
-	if (input_handler.IsKeyPressed(Keys::Down) || input_handler.IsKeyPressed(Keys::S))
-		m_camera->Move({ 0.0f, 0.0f, m_camera_velocity * dt });
-	if (input_handler.IsKeyPressed(Keys::Right) || input_handler.IsKeyPressed(Keys::D))
-		m_camera->Move({ m_camera_velocity * dt, 0.0f, 0.0f });
-	if (input_handler.IsKeyPressed(Keys::Left) || input_handler.IsKeyPressed(Keys::A))
-		m_camera->Move({ -m_camera_velocity * dt, 0.0f, 0.0f });
-	if(input_handler.IsKeyPressed(Keys::Space))
-		m_camera->Move({ 0.0f, m_camera_velocity * dt, 0.0f });
-	if(input_handler.IsKeyPressed(Keys::LCtrl))
-		m_camera->Move({ 0.0f, -m_camera_velocity * dt, 0.0f });
-	if(input_handler.IsKeyPressed(Keys::Esc))
+	if (input_handler.IsKeyPressed(Keys::Up) || input_handler.IsKeyPressed(Keys::W)) //fram
+		m_camera->Move(m_camera->GetForward() * m_camera_velocity * dt);
+
+	if (input_handler.IsKeyPressed(Keys::Down) || input_handler.IsKeyPressed(Keys::S))//bak
+		m_camera->Move(-m_camera->GetForward() * m_camera_velocity * dt);
+
+	if (input_handler.IsKeyPressed(Keys::Right) || input_handler.IsKeyPressed(Keys::D))//höger
+		m_camera->Move(m_camera->GetRight() * m_camera_velocity * dt);
+
+	if (input_handler.IsKeyPressed(Keys::Left) || input_handler.IsKeyPressed(Keys::A))//vänster
+		m_camera->Move(-m_camera->GetRight() * m_camera_velocity * dt);
+
+	if(input_handler.IsKeyPressed(Keys::Space))//upp
+		m_camera->Move(m_camera->GetUp() * m_camera_velocity * dt);
+
+	if(input_handler.IsKeyPressed(Keys::LCtrl)) //ner
+		m_camera->Move(-m_camera->GetUp() * m_camera_velocity * dt);
+
+	if(input_handler.IsKeyPressed(Keys::Esc)) //quit
 		PostQuitMessage(0);
 
 	// Mouse look
@@ -115,7 +121,7 @@ void OurTestScene::Update(
 		mat4f::scaling(0.7f, 0.7f, 0.7f);              
 
 	m_cube_moon_transform =	// månen
-		mat4f::rotation(-m_angle * 2.5f, 0.0f, 1.0f, 0.0f) *
+		mat4f::rotation(-m_angle * 2.5f, 0.0f, 0.0f, 1.0f) *
 		mat4f::translation(1.0f, 0.0f, 0.0f) *
 		mat4f::scaling(0.4f, 0.4f, 0.4f);
 
