@@ -57,7 +57,11 @@ void Camera::Rotate(float delta_yaw, float delta_pitch) noexcept
 	}
 }
 
-
+//vad vi igentligen gör här:
+//x = cos(vertical_angle) * sin(horizontal_angle)
+//y = sin(vertical_angle)
+//z = cos(vertical_angle) * cos(horizontal_angle)
+//men vi anpassar med minus tecken eftersom att våran kameras frammåt ligger på -z
 
 vec3f Camera::GetForward() const noexcept
 {
