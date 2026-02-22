@@ -26,7 +26,7 @@ struct LightCameraBuffer
 
 struct MaterialBuffer
 {
+	linalg::vec4f AmbientColor;
 	linalg::vec4f DiffuseColor;
 	linalg::vec4f SpecularColor;
-	linalg::vec4f AmbientColor;
 };

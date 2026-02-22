@@ -33,6 +33,7 @@ OurTestScene::OurTestScene(
 	InitTransformationBuffer();
 	// + init other CBuffers
 	InitLightCameraBuffer();
+	InitMaterialBuffer();
 }
 
 //
@@ -161,6 +162,7 @@ void OurTestScene::Render()
 	// Bind transformation_buffer to slot b0 of the VS
 	m_dxdevice_context->VSSetConstantBuffers(0, 1, &m_transformation_buffer);
 	m_dxdevice_context->PSSetConstantBuffers(0, 1, &m_light_buffer);
+	m_dxdevice_context->PSSetConstantBuffers(1, 1, &m_material_buffer);	
 
 	UpdateLightCameraBuffer(vec4f(m_light_position, 1.0f) , vec4f(m_camera->Position(), 1.0f)); //lägger till 1.0 för att göra vec3's till vec4
 
@@ -173,16 +175,45 @@ void OurTestScene::Render()
 	UpdateTransformationBuffer(m_quad_transform, m_view_matrix, m_projection_matrix);
 	//m_quad->Render();
 
+
+	//ambient är hur skuggfärgen, färgen som materialet har i skugga (R, G, B, A)
+	//diffuse är den färg som materialet har i ljus (R, G, B, A)
+	//specular är den färg som materialet har i glans (R, G, B, A) där rbg är färgen på glansen och a är hur stark glansen är
+
+
+	//KUBEN
+	MaterialBuffer cubeMat;
+	cubeMat.AmbientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+	cubeMat.DiffuseColor = { 0.0f, 0.0f, 1.0f, 1.0f }; //blå
+	cubeMat.SpecularColor = { 0.2f, 0.2f, 0.2f, 1.0f };
+	UpdateMaterialBuffer(cubeMat);
 	UpdateTransformationBuffer(m_cube_transform, m_view_matrix, m_projection_matrix);
-	m_cube->Render(); //kub render
+	m_cube->Render();
 
+	//JORDEN
+	MaterialBuffer earthMat;
+	earthMat.AmbientColor = { 0.0f, 0.0f, 0.1f, 1.0f }; 
+	earthMat.DiffuseColor = { 0.0f, 1.0f, 0.0f, 1.0f }; //grön
+	earthMat.SpecularColor = { 0.2f, 0.2f, 0.2f, 1.0f };
+	UpdateMaterialBuffer(earthMat);
 	UpdateTransformationBuffer(m_cube_earth_transform, m_view_matrix, m_projection_matrix);
-	m_cube_earth->Render(); //jorden render
+	m_cube_earth->Render();
 
+	//MÅNE
+	MaterialBuffer moonMat;
+	moonMat.AmbientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+	moonMat.DiffuseColor = { 1.0f, 0.0f, 0.0f, 1.0f }; //röd
+	moonMat.SpecularColor = { 0.2f, 0.2f, 0.2f, 1.0f }; 
+	UpdateMaterialBuffer(moonMat);
 	UpdateTransformationBuffer(m_cube_moon_transform, m_view_matrix, m_projection_matrix);
-	m_cube_moon->Render(); //månden render
+	m_cube_moon->Render();
 
-	// Load matrices + Sponza's transformation to the device and render it
+	// SPONZA
+	MaterialBuffer sponzaMat;
+	sponzaMat.AmbientColor = { 0.1f, 0.1f, 0.1f, 1.0f };
+	sponzaMat.DiffuseColor = { 0.8f, 0.8f, 0.8f, 1.0f };
+	sponzaMat.SpecularColor = { 0.0f, 0.0f, 0.0f, 1.0f };
+	UpdateMaterialBuffer(sponzaMat);
 	UpdateTransformationBuffer(m_sponza_transform, m_view_matrix, m_projection_matrix);
 	m_sponza->Render();
 }
@@ -202,6 +233,7 @@ void OurTestScene::Release()
 	// + release other CBuffers
 
 	SAFE_RELEASE(m_light_buffer);
+	SAFE_RELEASE(m_material_buffer);
 }
 
 void OurTestScene::OnWindowResized(
@@ -240,6 +272,19 @@ void OurTestScene::InitLightCameraBuffer() //samma som InitTransformation buffer
 	ASSERT(hr = m_dxdevice->CreateBuffer(&LightCameraBufferDesc, nullptr, &m_light_buffer));
 }
 
+void OurTestScene::InitMaterialBuffer()
+{
+	HRESULT hr;
+	D3D11_BUFFER_DESC MaterialBufferDesc = { 0 };
+	MaterialBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	MaterialBufferDesc.ByteWidth = sizeof(MaterialBuffer);
+	MaterialBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	MaterialBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	MaterialBufferDesc.MiscFlags = 0;
+	MaterialBufferDesc.StructureByteStride = 0;
+	ASSERT(hr = m_dxdevice->CreateBuffer(&MaterialBufferDesc, nullptr, &m_material_buffer));
+}
+
 
 void OurTestScene::UpdateTransformationBuffer(
 	mat4f ModelToWorldMatrix,
@@ -268,4 +313,15 @@ void OurTestScene::UpdateLightCameraBuffer(
 	lightCamBuffer->CameraPosition = CameraPosition;
 	lightCamBuffer->LightPosition = LightPosition;
 	m_dxdevice_context->Unmap(m_light_buffer, 0);
+}
+
+void OurTestScene::UpdateMaterialBuffer(MaterialBuffer material)
+{
+	D3D11_MAPPED_SUBRESOURCE resource;
+	m_dxdevice_context->Map(m_material_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	MaterialBuffer* materialBuffer = (MaterialBuffer*)resource.pData;
+	materialBuffer->AmbientColor = material.AmbientColor;
+	materialBuffer->DiffuseColor = material.DiffuseColor;
+	materialBuffer->SpecularColor = material.SpecularColor;
+	m_dxdevice_context->Unmap(m_material_buffer, 0);
 }

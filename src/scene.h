@@ -80,6 +80,7 @@ class OurTestScene : public Scene
 	ID3D11Buffer* m_transformation_buffer = nullptr;
 	// + other CBuffers
 	ID3D11Buffer* m_light_buffer = nullptr;
+	ID3D11Buffer* m_material_buffer = nullptr;
 
 	//
 	// Scene content
@@ -87,7 +88,7 @@ class OurTestScene : public Scene
 	Camera* m_camera;
 
 	//ljus
-	vec3f m_light_position;
+	vec3f m_light_position;// = { 10, 1, 1 };
 
 	Model* m_quad;
 	Model* m_cube; //min kub
@@ -112,10 +113,12 @@ class OurTestScene : public Scene
 
 	void InitTransformationBuffer();
 	void InitLightCameraBuffer();
+	void InitMaterialBuffer();
 
 
 	void UpdateTransformationBuffer(mat4f model_to_world_matrix, mat4f world_to_view_matrix, mat4f projection_matrix);
 	void UpdateLightCameraBuffer(linalg::vec4f light_pos, linalg::vec4f camera_pos);
+	void UpdateMaterialBuffer(MaterialBuffer material);
 
 public:
 	/**
