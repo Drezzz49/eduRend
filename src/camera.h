@@ -73,6 +73,7 @@ public:
 
 	linalg::vec3f GetUp() const noexcept;
 
+	linalg::vec3f Position() const noexcept { return m_position; }
 
 	void Rotate(float delta_yaw, float delta_pitch) noexcept; //noexcept promises to throw no exceptions
 

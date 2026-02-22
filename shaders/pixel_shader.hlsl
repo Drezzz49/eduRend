@@ -8,6 +8,20 @@ struct PSIn
 	float2 TexCoord : TEX;
 };
 
+cbuffer LightCamBuffer : register(b0)
+{
+    float4 CameraPosition;
+    float4 LightPosition;
+};
+
+cbuffer MaterialBuffer : register(b1)
+{
+    float4 Ambient;
+    float4 Diffuse;
+    float4 Specular;
+};
+
+
 //-----------------------------------------------------------------------------------------
 // Pixel Shader
 //-----------------------------------------------------------------------------------------
@@ -17,6 +31,7 @@ float4 PS_main(PSIn input) : SV_Target
 	// Debug shading #1: map and return normal as a color, i.e. from [-1,1]->[0,1] per component
 	// The 4:th component is opacity and should be = 1
 	return float4(input.Normal*0.5+0.5, 1);
+	
 	
 	// Debug shading #2: map and return texture coordinates as a color (blue = 0)
 //	return float4(input.TexCoord, 0, 1);

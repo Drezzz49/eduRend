@@ -12,7 +12,7 @@
 #include "Camera.h"
 #include "Model.h"
 #include "Texture.h"
-#include "buffers.h"
+#include "buffers.h" // så vi kan använda våra CBuffers i scenen
 
 /**
  * @brief Abstract class defining scene rendering and updating.
@@ -79,11 +79,15 @@ class OurTestScene : public Scene
 	// CBuffer for transformation matrices
 	ID3D11Buffer* m_transformation_buffer = nullptr;
 	// + other CBuffers
+	ID3D11Buffer* m_light_buffer = nullptr;
 
 	//
 	// Scene content
 	//
 	Camera* m_camera;
+
+	//ljus
+	vec3f m_light_position;
 
 	Model* m_quad;
 	Model* m_cube; //min kub
@@ -107,8 +111,11 @@ class OurTestScene : public Scene
 	float m_fps_cooldown = 0;
 
 	void InitTransformationBuffer();
+	void InitLightCameraBuffer();
+
 
 	void UpdateTransformationBuffer(mat4f model_to_world_matrix, mat4f world_to_view_matrix, mat4f projection_matrix);
+	void UpdateLightCameraBuffer(linalg::vec4f light_pos, linalg::vec4f camera_pos);
 
 public:
 	/**
@@ -148,6 +155,6 @@ public:
 	 * @param window_height New height
 	*/
 	void OnWindowResized(int window_width, int window_height) override;
-};
 
+};
 #endif

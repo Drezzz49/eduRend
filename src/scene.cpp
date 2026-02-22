@@ -32,6 +32,7 @@ OurTestScene::OurTestScene(
 { 
 	InitTransformationBuffer();
 	// + init other CBuffers
+	InitLightCameraBuffer();
 }
 
 //
@@ -159,6 +160,10 @@ void OurTestScene::Render()
 {
 	// Bind transformation_buffer to slot b0 of the VS
 	m_dxdevice_context->VSSetConstantBuffers(0, 1, &m_transformation_buffer);
+	m_dxdevice_context->PSSetConstantBuffers(0, 1, &m_light_buffer);
+
+	UpdateLightCameraBuffer(vec4f(m_light_position, 1.0f) , vec4f(m_camera->Position(), 1.0f)); //lägger till 1.0 för att göra vec3's till vec4
+
 
 	// Obtain the matrices needed for rendering from the camera
 	m_view_matrix = m_camera->WorldToViewMatrix(); //view-matrisen, som är den som gör att det ser ut som att kameran rör sig i scenen
@@ -195,6 +200,8 @@ void OurTestScene::Release()
 
 	SAFE_RELEASE(m_transformation_buffer);
 	// + release other CBuffers
+
+	SAFE_RELEASE(m_light_buffer);
 }
 
 void OurTestScene::OnWindowResized(
@@ -220,6 +227,20 @@ void OurTestScene::InitTransformationBuffer()
 	ASSERT(hr = m_dxdevice->CreateBuffer(&matrixBufferDesc, nullptr, &m_transformation_buffer));
 }
 
+void OurTestScene::InitLightCameraBuffer() //samma som InitTransformation buffer fast utbytta variabler för LightCameraBuffer
+{
+	HRESULT hr;
+	D3D11_BUFFER_DESC LightCameraBufferDesc = { 0 };
+	LightCameraBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	LightCameraBufferDesc.ByteWidth = sizeof(LightCameraBuffer);
+	LightCameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	LightCameraBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	LightCameraBufferDesc.MiscFlags = 0;
+	LightCameraBufferDesc.StructureByteStride = 0;
+	ASSERT(hr = m_dxdevice->CreateBuffer(&LightCameraBufferDesc, nullptr, &m_light_buffer));
+}
+
+
 void OurTestScene::UpdateTransformationBuffer(
 	mat4f ModelToWorldMatrix,
 	mat4f WorldToViewMatrix,
@@ -233,4 +254,18 @@ void OurTestScene::UpdateTransformationBuffer(
 	matrixBuffer->WorldToViewMatrix = WorldToViewMatrix;
 	matrixBuffer->ProjectionMatrix = ProjectionMatrix;
 	m_dxdevice_context->Unmap(m_transformation_buffer, 0);
+}
+
+
+void OurTestScene::UpdateLightCameraBuffer(
+	linalg::vec4f LightPosition,
+	linalg::vec4f CameraPosition)
+{
+	// Map the resource buffer, obtain a pointer and then write our matrices to it
+	D3D11_MAPPED_SUBRESOURCE resource;
+	m_dxdevice_context->Map(m_light_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
+	LightCameraBuffer * lightCamBuffer = (LightCameraBuffer*)resource.pData;
+	lightCamBuffer->CameraPosition = CameraPosition;
+	lightCamBuffer->LightPosition = LightPosition;
+	m_dxdevice_context->Unmap(m_light_buffer, 0);
 }
