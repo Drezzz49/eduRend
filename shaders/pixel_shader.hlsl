@@ -1,5 +1,6 @@
 
 Texture2D texDiffuse : register(t0);
+SamplerState texSampler : register(s0); //sampler som används för att hämta färg från texturen
 
 struct PSIn
 {
@@ -58,6 +59,13 @@ float4 PS_main(PSIn input) : SV_Target
     float spec = pow(max(dot(R, V), 0.0f), Specular.w);
     float3 specular = spec * Specular.rgb; //mulitplicerar spec med materialets specular färg för att få den slutliga specular färgen
     
+    //tex sampler för att hämta färgen från texturen, multiplicerar den med ambient och diffuse
+    float3 texColor = texDiffuse.Sample(texSampler, input.TexCoord * 1.0f).rgb; //multiplicerar texCoord med 1.0f så det är lätt att ändra till ex:3.0f för att via fler repitioner av texturen
+    
+    //multiplicerar ambient och diffuse med texturfärgen för att få den slutliga färgen
+    float3 finalAmbient = ambient * texColor;
+    //multiplicerar ambient och diffuse med texturfärgen för att få den slutliga färgen
+    float3 finalDiffuse = diffuse * texColor;
     
     ////test med röd färg istället för material buffer
     //ambient
@@ -70,8 +78,7 @@ float4 PS_main(PSIn input) : SV_Target
     //float3 specular = spec * float3(1.0f, 1.0f, 1.0f); // Vitt blänk
 
     
-    float3 finalColor = ambient + diffuse + specular;
-
+    float3 finalColor = finalAmbient + finalDiffuse + specular;
     return float4(finalColor, 1.0f);
     
 }

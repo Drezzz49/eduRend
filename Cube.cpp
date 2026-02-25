@@ -6,7 +6,6 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 	std::vector<unsigned> indices;
 
 
-
 	// Populate the vertex array with 4 Vertices
 	Vertex v0, v1, v2, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16, v17, v18, v19, v20, v21, v22, v23;
 	v0.Position = { -0.5, -0.5f, 0.5f }; //pos
@@ -243,6 +242,9 @@ Cube::Cube(ID3D11Device* dxdevice, ID3D11DeviceContext* dxdevice_context) : Mode
 
 void Cube::Render() const
 {
+	//så vi kan använda texturen i pixel shadern
+	m_dxdevice_context->PSSetShaderResources(0, 1, &m_texture.TextureView);
+
 	// Bind our vertex buffer
 	const UINT32 stride = sizeof(Vertex); //  sizeof(float) * 8;
 	const UINT32 offset = 0;
@@ -253,4 +255,11 @@ void Cube::Render() const
 
 	// Make the drawcall
 	m_dxdevice_context->DrawIndexed(m_number_of_indices, 0, 0);
+}
+
+
+void Cube::LoadTexture(const std::string& filename)
+{
+	//laddar in en textur från fil och skapar en shader resource view som kan bindas i pixel shadern
+	HRESULT hr = LoadTextureFromFile(m_dxdevice, m_dxdevice_context, filename.c_str(), &m_texture);
 }

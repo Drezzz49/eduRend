@@ -13,6 +13,7 @@
 #include "Model.h"
 #include "Texture.h"
 #include "buffers.h" // så vi kan använda våra CBuffers i scenen
+#include "../cube.h"
 
 /**
  * @brief Abstract class defining scene rendering and updating.
@@ -81,6 +82,7 @@ class OurTestScene : public Scene
 	// + other CBuffers
 	ID3D11Buffer* m_light_buffer = nullptr;
 	ID3D11Buffer* m_material_buffer = nullptr;
+	ID3D11SamplerState* m_sampler_state = nullptr;
 
 	//
 	// Scene content
@@ -91,9 +93,9 @@ class OurTestScene : public Scene
 	vec3f m_light_position;// = { 10, 1, 1 };
 
 	Model* m_quad;
-	Model* m_cube; //min kub
-	Model* m_cube_earth; //jorden, ett lager åt från vanliga kuben som ska vara solen
-	Model* m_cube_moon; //månen, ett lager åt från jorden
+	Cube* m_cube; //min kub
+	Cube* m_cube_earth; //jorden, ett lager åt från vanliga kuben som ska vara solen
+	Cube* m_cube_moon; //månen, ett lager åt från jorden
 	Model* m_sponza;
 
 	mat4f m_sponza_transform;

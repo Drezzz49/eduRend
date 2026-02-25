@@ -56,6 +56,34 @@ void OurTestScene::Init()
 	m_cube_earth = new Cube(m_dxdevice, m_dxdevice_context);
 	m_cube_moon = new Cube(m_dxdevice, m_dxdevice_context);
 	m_sponza = new OBJModel("assets/crytek-sponza/sponza.obj", m_dxdevice, m_dxdevice_context);
+
+
+	//ladda texturer för min kuber
+	m_cube->LoadTexture("assets/textures/yroadcrossing.png");
+	m_cube_earth->LoadTexture("assets/textures/wood.png");
+	m_cube_moon->LoadTexture("assets/textures/crate.png");
+
+	//inställningar för texture samplern
+	
+	//textur typer
+	//D3D11_TEXTURE_ADDRESS_WRAP //texturen upprepas
+	//D3D11_TEXTURE_ADDRESS_MIRROR //texturen speglas och upprepas
+	//D3D11_TEXTURE_ADDRESS_CLAMP //texturen sträcks ut över hela ytan
+
+	//filter typer
+	//D3D11_FILTER_MIN_MAG_MIP_POINT 
+	//D3D11_FILTER_MIN_MAG_MIP_LINEAR
+	//D3D11_FILTER_ANISOTROPIC
+
+
+	D3D11_SAMPLER_DESC samplerDesc = {};
+	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT; // filter mode, hur texturen skalas när den inte matchar ytan den ritas på
+	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP; //vad som händer med u axlen när texturen tar slut
+	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP; //vad som händer med v axlen när texturen tar slut
+	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP; //vad som händer med w axlen när texturen tar slut
+	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX; //hur många mipmap nivåer som används
+
+	m_dxdevice->CreateSamplerState(&samplerDesc, &m_sampler_state);
 }
 
 //
@@ -162,7 +190,8 @@ void OurTestScene::Render()
 	// Bind transformation_buffer to slot b0 of the VS
 	m_dxdevice_context->VSSetConstantBuffers(0, 1, &m_transformation_buffer);
 	m_dxdevice_context->PSSetConstantBuffers(0, 1, &m_light_buffer);
-	m_dxdevice_context->PSSetConstantBuffers(1, 1, &m_material_buffer);	
+	m_dxdevice_context->PSSetConstantBuffers(1, 1, &m_material_buffer);
+	m_dxdevice_context->PSSetSamplers(0, 1, &m_sampler_state);
 
 	UpdateLightCameraBuffer(vec4f(m_light_position, 1.0f) , vec4f(m_camera->Position(), 1.0f)); //lägger till 1.0 för att göra vec3's till vec4
 
@@ -234,6 +263,7 @@ void OurTestScene::Release()
 
 	SAFE_RELEASE(m_light_buffer);
 	SAFE_RELEASE(m_material_buffer);
+	SAFE_RELEASE(m_sampler_state);
 }
 
 void OurTestScene::OnWindowResized(
