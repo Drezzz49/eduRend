@@ -56,6 +56,11 @@ public:
 		SAFE_RELEASE(m_vertex_buffer);
 		SAFE_RELEASE(m_index_buffer);
 	}
+
+
+	void compute_TB(Vertex& v0, Vertex& v1, Vertex& v2); // för att räkna ut tangent och binormal, så att vi kan använda bump mapping i våra shaders
+
+
 };
 
 #endif

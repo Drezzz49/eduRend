@@ -19,7 +19,14 @@ OBJModel::OBJModel(
 	{
 		// Append the drawcall indices
 		for (auto& tri : dc.Triangles)
+		{
 			indices.insert(indices.end(), tri.VertexIndices, tri.VertexIndices + 3);
+
+			// anropa conpute_TB för varje triangel i drawcallen, så att vi får ut tangent och binormal för varje vertex
+			compute_TB(mesh->Vertices[tri.VertexIndices[0]], mesh->Vertices[tri.VertexIndices[1]], mesh->Vertices[tri.VertexIndices[2]]);
+		}
+			
+
 
 		// Create a range
 		unsigned int indexSize = (unsigned int)dc.Triangles.size() * 3;
@@ -76,6 +83,14 @@ OBJModel::OBJModel(
 				&material.DiffuseTexture);
 			std::cout << "\t" << material.DiffuseTextureFilename
 				<< (SUCCEEDED(hr) ? " - OK" : "- FAILED") << std::endl;
+
+			if (material.NormalTextureFilename.size())
+			{
+				hr = LoadTextureFromFile(dxdevice, material.NormalTextureFilename.c_str(), &material.NormalTexture);
+				std::cout << "\tNormal Map: " << material.NormalTextureFilename
+					<< (SUCCEEDED(hr) ? " - OK" : "- FAILED") << std::endl;
+			}
+
 		}
 
 		// + other texture types here - see Material class
@@ -106,6 +121,12 @@ void OBJModel::Render() const
 		m_dxdevice_context->PSSetShaderResources(0, 1, &material.DiffuseTexture.TextureView);
 		// + bind other textures here, e.g. a normal map, to appropriate slots
 
+
+		if (material.NormalTexture.TextureView) //om det finns en normal texture så bindar vi den till slot t1 i pixel shadern
+		{
+			m_dxdevice_context->PSSetShaderResources(1, 1, &material.NormalTexture.TextureView);
+		}
+
 		// Make the drawcall
 		m_dxdevice_context->DrawIndexed(indexRange.Size, indexRange.Start, 0);
 	}
@@ -116,6 +137,7 @@ OBJModel::~OBJModel()
 	for (auto& material : m_materials)
 	{
 		SAFE_RELEASE(material.DiffuseTexture.TextureView);
+		SAFE_RELEASE(material.NormalTexture.TextureView);
 
 		// Release other used textures ...
 	}

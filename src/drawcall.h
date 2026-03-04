@@ -25,8 +25,8 @@ struct Vertex
 {
 	vec3f Position; //!< 3D coordinate of the vertex
 	vec3f Normal; //!< Normal of the vertex
-	vec3f Tangent; //!< Tangent of the vertex
-	vec3f Binormal; //!< Binormal of the vertex
+	vec3f Tangent; //!< Tangent of the vertex (för bump mapping)
+	vec3f Binormal; //!< Binormal of the vertex (för bump mapping)
 	vec2f TexCoord; //!< 2D texture coordiante of the vertex
 };
 
@@ -50,6 +50,7 @@ struct Material
 
 	// Device textures
 	Texture DiffuseTexture; //!< Diffuse Texture
+	Texture NormalTexture; //!< Normal Texture
 	// + other texture types
 };
 

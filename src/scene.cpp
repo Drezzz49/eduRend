@@ -44,7 +44,7 @@ void OurTestScene::Init()
 	m_camera = new Camera(
 		45.0f * fTO_RAD,		// field-of-view (radians)
 		(float)m_window_width / m_window_height,	// aspect ratio
-		1.0f,					// z-near plane (everything closer will be clipped/removed)
+		0.1f,					// z-near plane (everything closer will be clipped/removed)
 		500.0f);				// z-far plane (everything further will be clipped/removed)
 
 	// Move camera to (0,0,5)
@@ -77,11 +77,14 @@ void OurTestScene::Init()
 
 
 	D3D11_SAMPLER_DESC samplerDesc = {};
-	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT; // filter mode, hur texturen skalas när den inte matchar ytan den ritas på
+	samplerDesc.Filter = D3D11_FILTER_ANISOTROPIC; // filter mode, hur texturen skalas när den inte matchar ytan den ritas på
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP; //vad som händer med u axlen när texturen tar slut
 	samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP; //vad som händer med v axlen när texturen tar slut
 	samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP; //vad som händer med w axlen när texturen tar slut
+	samplerDesc.MaxAnisotropy = 16; //hur mycket anisotropisk filtrering som används, högre värde ger bättre kvalitet
 	samplerDesc.MaxLOD = D3D11_FLOAT32_MAX; //hur många mipmap nivåer som används
+	samplerDesc.MinLOD = 0; //lägsta mipmap nivån som används
+	samplerDesc.MipLODBias = -1.0f;
 
 	m_dxdevice->CreateSamplerState(&samplerDesc, &m_sampler_state);
 }
@@ -162,6 +165,10 @@ void OurTestScene::Update(
 
 
 
+	//uppdatera ljusets position mellan x10 och x-10 i xz-planet, så att det rör sig i en cirkel runt origo
+	m_light_position = vec3f(20.0f * cos(m_angle), 0, 20.0f * sin(m_angle)); //roterar runt origo i xz-planet
+
+
 
 
 	// Sponza model-to-world transformation
@@ -170,7 +177,7 @@ void OurTestScene::Update(
 		mat4f::scaling(0.05f);						 // The scene is quite large so scale it down to 5%
 
 	// Increment the rotation angle.
-	m_angle += m_angular_velocity * dt * 0.4;
+	m_angle += m_angular_velocity * dt * 0.8;
 
 	// Print fps
 	m_fps_cooldown -= dt;
@@ -187,13 +194,16 @@ void OurTestScene::Update(
 //
 void OurTestScene::Render()
 {
+
+	UpdateLightCameraBuffer(vec4f(m_light_position, 1.0f), vec4f(m_camera->Position(), 1.0f)); //lägger till 1.0 för att göra vec3's till vec4
+
 	// Bind transformation_buffer to slot b0 of the VS
 	m_dxdevice_context->VSSetConstantBuffers(0, 1, &m_transformation_buffer);
 	m_dxdevice_context->PSSetConstantBuffers(0, 1, &m_light_buffer);
 	m_dxdevice_context->PSSetConstantBuffers(1, 1, &m_material_buffer);
 	m_dxdevice_context->PSSetSamplers(0, 1, &m_sampler_state);
 
-	UpdateLightCameraBuffer(vec4f(m_light_position, 1.0f) , vec4f(m_camera->Position(), 1.0f)); //lägger till 1.0 för att göra vec3's till vec4
+
 
 
 	// Obtain the matrices needed for rendering from the camera
@@ -217,7 +227,7 @@ void OurTestScene::Render()
 	cubeMat.SpecularColor = { 0.2f, 0.2f, 0.2f, 1.0f };
 	UpdateMaterialBuffer(cubeMat);
 	UpdateTransformationBuffer(m_cube_transform, m_view_matrix, m_projection_matrix);
-	m_cube->Render();
+	//m_cube->Render();
 
 	//JORDEN
 	MaterialBuffer earthMat;
@@ -226,7 +236,7 @@ void OurTestScene::Render()
 	earthMat.SpecularColor = { 0.2f, 0.2f, 0.2f, 1.0f };
 	UpdateMaterialBuffer(earthMat);
 	UpdateTransformationBuffer(m_cube_earth_transform, m_view_matrix, m_projection_matrix);
-	m_cube_earth->Render();
+	//m_cube_earth->Render();
 
 	//MÅNE
 	MaterialBuffer moonMat;
@@ -235,7 +245,7 @@ void OurTestScene::Render()
 	moonMat.SpecularColor = { 0.2f, 0.2f, 0.2f, 1.0f }; 
 	UpdateMaterialBuffer(moonMat);
 	UpdateTransformationBuffer(m_cube_moon_transform, m_view_matrix, m_projection_matrix);
-	m_cube_moon->Render();
+	//m_cube_moon->Render();
 
 	// SPONZA
 	MaterialBuffer sponzaMat;
@@ -340,8 +350,8 @@ void OurTestScene::UpdateLightCameraBuffer(
 	D3D11_MAPPED_SUBRESOURCE resource;
 	m_dxdevice_context->Map(m_light_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &resource);
 	LightCameraBuffer * lightCamBuffer = (LightCameraBuffer*)resource.pData;
-	lightCamBuffer->CameraPosition = CameraPosition;
 	lightCamBuffer->LightPosition = LightPosition;
+	lightCamBuffer->CameraPosition = CameraPosition;
 	m_dxdevice_context->Unmap(m_light_buffer, 0);
 }
 
