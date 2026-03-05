@@ -48,15 +48,28 @@ float4 PS_main(PSIn input) : SV_Target
     float3x3 TBN = float3x3(T, B, N); //TBN-matris som används för att transformera normaler från tangent space till world space
     
     // Sampla normalen från normal-mappen (t1) färgen från bilden
-    float3 normalSample = texNormal.Sample(texSampler, input.TexCoord).rgb;
+    
+        
+        float4 normalSample = texNormal.Sample(texSampler, input.TexCoord);
     // gör om normalsample från färg (0-1) till normalvektor (-1,1)
-    float3 localNormal = normalSample * 2.0f - 1.0f;
+    float3 localNormal = normalSample.rgb * 2.0f - 1.0f;
     // Transformera lokalen normalen till World Space med hjälp av TBN
     float3 bumpedNormalW = normalize(mul(localNormal, TBN)); //rätt ordning
     //float3 bumpedNormalW = normalize(mul(TBN, localNormal));
     
     
-    float3 L = normalize(LightPosition.xyz - input.PosWorld); //vektorn från ytan till ljuskällan
+    //om det inte finns en normal i normal-mappen (dvs alpha < 1) så använder vi den vanliga normalen istället för den bumpade normalen
+    if (normalSample.a < 1) 
+    {
+        bumpedNormalW = N;
+    }
+    
+    if (input.Pos.x > 500)
+    {
+        bumpedNormalW = N;
+    }
+    
+        float3 L = normalize(LightPosition.xyz - input.PosWorld); //vektorn från ytan till ljuskällan
     float3 V = normalize(CameraPosition.xyz - input.PosWorld); //vektorn från ytan till kameran
     float3 R = reflect(-L, bumpedNormalW); //reflektionvektorn, -1*L eftersom reflect förväntar sig en vektor från ljuskällan till ytan, och vi har L som är från ytan till ljuskällan. N är den normala vektorn på ytan.
     //byter ut N mot bumpedNormalW för att använda den bumpade normalen istället för den vanliga normalen i ljusberäkningarna

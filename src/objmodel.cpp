@@ -122,7 +122,7 @@ void OBJModel::Render() const
 		// + bind other textures here, e.g. a normal map, to appropriate slots
 
 
-		if (material.NormalTexture.TextureView) //om det finns en normal texture så bindar vi den till slot t1 i pixel shadern
+		if (true) //om det finns en normal texture så bindar vi den till slot t1 i pixel shadern
 		{
 			m_dxdevice_context->PSSetShaderResources(1, 1, &material.NormalTexture.TextureView);
 		}
