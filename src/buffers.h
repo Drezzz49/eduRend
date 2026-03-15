@@ -29,4 +29,6 @@ struct MaterialBuffer
 	linalg::vec4f AmbientColor;
 	linalg::vec4f DiffuseColor;
 	linalg::vec4f SpecularColor;
+	float isSkybox;
+	float padding[3]; // padding to make the struct size a multiple of 16 bytes
 };

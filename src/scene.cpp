@@ -45,7 +45,7 @@ void OurTestScene::Init()
 		45.0f * fTO_RAD,		// field-of-view (radians)
 		(float)m_window_width / m_window_height,	// aspect ratio
 		0.1f,					// z-near plane (everything closer will be clipped/removed)
-		500.0f);				// z-far plane (everything further will be clipped/removed)
+		1000.0f);				// z-far plane (everything further will be clipped/removed)
 
 	// Move camera to (0,0,5)
 	m_camera->MoveTo({ 0, 0, 5 });
@@ -87,6 +87,40 @@ void OurTestScene::Init()
 	samplerDesc.MipLODBias = -1.0f;
 
 	m_dxdevice->CreateSamplerState(&samplerDesc, &m_sampler_state);
+
+
+
+	// Set up skybox
+	m_skybox = new Cube(m_dxdevice, m_dxdevice_context);
+
+	const char* skybox_filenames_debug[6] = {
+	"assets/cubemaps/debug_cubemap/debug_posx.png",
+	"assets/cubemaps/debug_cubemap/debug_negx.png",
+	"assets/cubemaps/debug_cubemap/debug_posy.png",
+	"assets/cubemaps/debug_cubemap/debug_negy.png",
+	"assets/cubemaps/debug_cubemap/debug_posz.png",
+	"assets/cubemaps/debug_cubemap/debug_negz.png"
+	};
+
+	const char* skybox_filenames_skybox[6] = {
+	"assets/cubemaps/grandcanyon_cubemap/posx.png",
+	"assets/cubemaps/grandcanyon_cubemap/negx.png",
+	"assets/cubemaps/grandcanyon_cubemap/negy.png", //negy och posy är bytta för att få det att se rätt ut
+	"assets/cubemaps/grandcanyon_cubemap/posy.png",
+	"assets/cubemaps/grandcanyon_cubemap/posz.png",
+	"assets/cubemaps/grandcanyon_cubemap/negz.png",
+	};
+
+
+	HRESULT hr = LoadCubeTextureFromFile(
+		m_dxdevice,
+		skybox_filenames_skybox,
+		&m_skybox_texture
+	);
+
+	if (SUCCEEDED(hr)) std::cout << "Cubemap OK" << std::endl;
+	else std::cout << "Cubemap failed to load" << std::endl;
+
 }
 
 //
@@ -167,6 +201,12 @@ void OurTestScene::Update(
 
 	//uppdatera ljusets position mellan x10 och x-10 i xz-planet, så att det rör sig i en cirkel runt origo
 	m_light_position = vec3f(20.0f * cos(m_angle), 0, 20.0f * sin(m_angle)); //roterar runt origo i xz-planet
+
+
+
+	//flytta skybox med kameran så man aldrig kan komma utanför den
+	m_skybox_transform = mat4f::translation(m_camera->Position()) * mat4f::scaling(400.0f); //skala upp den så att den täcker hela scenen
+
 
 
 
@@ -255,6 +295,23 @@ void OurTestScene::Render()
 	UpdateMaterialBuffer(sponzaMat);
 	UpdateTransformationBuffer(m_sponza_transform, m_view_matrix, m_projection_matrix);
 	m_sponza->Render();
+
+
+
+	MaterialBuffer skyMat = {};
+	skyMat.isSkybox = 1.0f;
+	//skyMat.isSkybox = 0.0f;
+	UpdateMaterialBuffer(skyMat);
+
+	//bind skyboxen till en ny slot så vi kan nå den i pixelshadern
+	m_dxdevice_context->PSSetShaderResources(2, 1, &m_skybox_texture.TextureView);
+	//rita skyboxen 
+	UpdateTransformationBuffer(m_skybox_transform, m_view_matrix, m_projection_matrix);
+	m_skybox->Render();
+
+
+
+
 }
 
 void OurTestScene::Release()
@@ -274,6 +331,10 @@ void OurTestScene::Release()
 	SAFE_RELEASE(m_light_buffer);
 	SAFE_RELEASE(m_material_buffer);
 	SAFE_RELEASE(m_sampler_state);
+
+	// Release skybox resources
+	SAFE_DELETE(m_skybox);
+	SAFE_RELEASE(m_skybox_texture.TextureView);
 }
 
 void OurTestScene::OnWindowResized(
@@ -363,5 +424,6 @@ void OurTestScene::UpdateMaterialBuffer(MaterialBuffer material)
 	materialBuffer->AmbientColor = material.AmbientColor;
 	materialBuffer->DiffuseColor = material.DiffuseColor;
 	materialBuffer->SpecularColor = material.SpecularColor;
+	materialBuffer->isSkybox = material.isSkybox;
 	m_dxdevice_context->Unmap(m_material_buffer, 0);
 }

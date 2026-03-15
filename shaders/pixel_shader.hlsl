@@ -2,6 +2,7 @@
 Texture2D texDiffuse : register(t0);
 SamplerState texSampler : register(s0); //sampler som används för att hämta färg från texturen
 Texture2D texNormal : register(t1); //normal map textur
+TextureCube texCube : register(t2); //cubemap textur för reflection eller skybox
 
 struct PSIn
 {
@@ -24,6 +25,7 @@ cbuffer MaterialBuffer : register(b1)
     float4 Ambient;
     float4 Diffuse;
     float4 Specular;
+    float IsSkybox;
 };
 
 
@@ -33,6 +35,7 @@ cbuffer MaterialBuffer : register(b1)
 
 float4 PS_main(PSIn input) : SV_Target
 {
+    
 	// Debug shading #1: map and return normal as a color, i.e. from [-1,1]->[0,1] per component
 	// The 4:th component is opacity and should be = 1
 	//return float4(input.Normal*0.5+0.5, 1);
@@ -40,6 +43,16 @@ float4 PS_main(PSIn input) : SV_Target
 	
 	// Debug shading #2: map and return texture coordinates as a color (blue = 0)
     //	return float4(input.TexCoord, 0, 1);
+    
+    
+    //skybox
+    if (IsSkybox > 0.5f)
+    {
+        float3 viewDir = normalize(input.PosWorld - CameraPosition.xyz);
+        viewDir.y = -viewDir.y; //invertera y-komponenten för att få rätt orientering på skyboxen
+        return texCube.Sample(texSampler, viewDir);
+    }
+    
     
     
     float3 T = normalize(input.Tangent); //ytans tangentvektor
@@ -64,13 +77,21 @@ float4 PS_main(PSIn input) : SV_Target
         bumpedNormalW = N;
     }
     
-    if (input.Pos.x > 500)
-    {
-        bumpedNormalW = N;
-    }
+    //if (input.Pos.x > 500)
+    //{
+    //    bumpedNormalW = N;
+    //}
     
-        float3 L = normalize(LightPosition.xyz - input.PosWorld); //vektorn från ytan till ljuskällan
+    float3 L = normalize(LightPosition.xyz - input.PosWorld); //vektorn från ytan till ljuskällan
     float3 V = normalize(CameraPosition.xyz - input.PosWorld); //vektorn från ytan till kameran
+    
+    //reflektion för cubemap
+    float3 R_cube = reflect(-V, bumpedNormalW);
+    R_cube.y = -R_cube.y; //invertera y-komponenten för att få rätt orientering på skyboxen    
+    float3 reflectionColor = texCube.Sample(texSampler, R_cube).rgb;
+    
+    //return float4(reflectionColor, 1.0f); //testa att bara returnera reflektionen från cubemapen
+    
     float3 R = reflect(-L, bumpedNormalW); //reflektionvektorn, -1*L eftersom reflect förväntar sig en vektor från ljuskällan till ytan, och vi har L som är från ytan till ljuskällan. N är den normala vektorn på ytan.
     //byter ut N mot bumpedNormalW för att använda den bumpade normalen istället för den vanliga normalen i ljusberäkningarna
     
@@ -97,6 +118,9 @@ float4 PS_main(PSIn input) : SV_Target
     //multiplicerar ambient och diffuse med texturfärgen för att få den slutliga färgen
     float3 finalDiffuse = diffuse * texColor;
     
+    //reflektions komponenten
+    float3 reflectionComponet = spec * reflectionColor * 0.4f;
+    
     ////test med röd färg istället för material buffer
     //ambient
     //float3 ambient = float3(0.1f, 0.1f, 0.1f); // Mörkgrått grundljus
@@ -108,7 +132,13 @@ float4 PS_main(PSIn input) : SV_Target
     //float3 specular = spec * float3(1.0f, 1.0f, 1.0f); // Vitt blänk
 
     
-    float3 finalColor = finalAmbient + finalDiffuse + specular;
+    if (input.Pos.x > 500)
+    {
+        reflectionComponet = 0;
+    }
+    
+    
+    float3 finalColor = finalAmbient + finalDiffuse + specular + reflectionComponet;
     return float4(finalColor, 1.0f);
     
 }

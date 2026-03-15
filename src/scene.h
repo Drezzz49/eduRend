@@ -107,6 +107,12 @@ class OurTestScene : public Scene
 	mat4f m_view_matrix;
 	mat4f m_projection_matrix;
 
+
+	// Skybox
+	Cube* m_skybox;
+	mat4f m_skybox_transform;
+	Texture m_skybox_texture;
+
 	// Misc
 	float m_angle = 0;			// A per-frame updated rotation angle (radians)...
 	float m_angular_velocity = fPI / 2;	// ...and its velocity (radians/sec)
